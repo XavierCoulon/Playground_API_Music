@@ -1,33 +1,26 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Track from "./Track";
-
-const accessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg3ZTA5OWU3LWZmYmUtNGY0Zi04MGZiLWVhZThiNThkZTUxZiIsInVzZXJuYW1lIjoid2lsZGVycyIsImVtYWlsIjoid2lsZGVyc0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImNyZWF0ZWRfYXQiOiIyMDIyLTEwLTE4VDE0OjIzOjEyLjc2NFoiLCJ1cGRhdGVkX2F0IjoiMjAyMi0xMC0xOFQxNDoyMjo0Ni43MjdaIiwiaWF0IjoxNjY2MTAzMDY1fQ.uKZd2lUn9iundgu3QVLMNwZwmnxhV3qUzJ3xNB10tW8";
-
-const apiUri = "https://wildify-api.jidayyy.com/api/v1";
-
-axios.interceptors.request.use((config) => {
-  config.headers.authorization = `Bearer ${accessToken}`;
-  return config;
-});
+import TrackItem from "./TrackItem";
+import Button from "./UI/Button";
+import TrackPlayer from "./TrackPlayer";
+import { getAllSongs, deleteSong, uploadTrack } from "../utils/axiosTools";
 
 const TracksList = () => {
   const [data, setData] = useState([]);
   const [selectedFile, setSelectedFile] = useState();
-
-  const fetchData = async () => {
-    const result = await axios(`${apiUri}/songs/`);
-    setData(result.data);
-  };
+  const [trackSrc, setTrackSrc] = useState();
 
   useEffect(() => {
-    fetchData();
+    getAllSongs().then((result) => setData(result.data));
   }, []);
 
   const handlerDeleteTrack = async (id) => {
-    await axios.delete(`${apiUri}/songs/${id}`);
-    fetchData();
+    deleteSong(id).then(() => {
+      getAllSongs().then((result) => setData(result.data));
+    });
+  };
+
+  const handlerPlayTrack = (trackSrc) => {
+    setTrackSrc(trackSrc);
   };
 
   const changeHandler = (event) => {
@@ -36,26 +29,17 @@ const TracksList = () => {
 
   const handleSubmission = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    await axios.post(`${apiUri}/songs/`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    fetchData();
+    uploadTrack(selectedFile).then(() =>
+      getAllSongs().then((result) => setData(result.data))
+    );
   };
 
   return (
     <div>
-      <form>
-        <label htmlFor="file">Select a MP3</label>
-        <input id="file" type="file" accept="mp3" onChange={changeHandler} />
-        <button onClick={handleSubmission}>Upload</button>
-      </form>
+      <h1>API Tests - without design 😉 </h1>
       <ul>
         {data.map((track) => (
-          <Track
+          <TrackItem
             key={track.id}
             id={track.id}
             title={track.title}
@@ -63,9 +47,16 @@ const TracksList = () => {
             mp3={track.link}
             img={track.album.picture}
             onDelete={handlerDeleteTrack}
+            onClick={handlerPlayTrack}
           />
         ))}
       </ul>
+      <form>
+        <label htmlFor="file">Select a MP3</label>
+        <input id="file" type="file" accept="mp3" onChange={changeHandler} />
+        <Button type="click" label="Upload" onClick={handleSubmission} />
+      </form>
+      <TrackPlayer src={trackSrc} />
     </div>
   );
 };
