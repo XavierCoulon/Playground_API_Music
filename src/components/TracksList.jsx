@@ -3,12 +3,15 @@ import TrackItem from "./TrackItem";
 import Button from "./UI/Button";
 import TrackPlayer from "./TrackPlayer";
 import { songs } from "../utils/axiosTools";
+import { toast } from "react-toastify";
+
 
 const TracksList = () => {
   const [data, setData] = useState([]);
   const [selectedFile, setSelectedFile] = useState();
   const [trackSrc, setTrackSrc] = useState();
   const [isLoading, setIsloading] = useState(false);
+  // const notify = (message) => toast(message);
 
   useEffect(() => {
     setIsloading(true);
@@ -22,9 +25,19 @@ const TracksList = () => {
     setIsloading(true);
     songs
       .delete(id)
-      .then((result) => alert(result.message))
-      .then(() => songs.getAll().then((result) => setData(result)))
-      .then(() => setIsloading(false));
+      .then((result) => {
+        toast.success(result.message);
+      })
+      .then(() =>
+        songs.getAll().then((result) => {
+          setData(result);
+          setIsloading(false);
+        })
+      )
+      .then(() => setIsloading(false))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handlerPlayTrack = (trackSrc) => {
@@ -38,11 +51,24 @@ const TracksList = () => {
   const handleSubmission = async (event) => {
     event.preventDefault();
     setIsloading(true);
+    const id = toast.loading("Please wait...")
     songs
       .upload(selectedFile)
-      .then((result) => alert(`Song ${result.title} created`))
+      .then((result) => {
+        // toast.success(`Song ${result.title} created`)
+        toast.update(id, {render: "All is good", type: "success", isLoading: false});
+      })
       .then(() => songs.getAll().then((result) => setData(result)))
-      .then(() => setIsloading(false));
+      .then(() => setIsloading(false))
+      .catch((error) => {
+        setIsloading(false);
+
+        const messages = JSON.parse(error.response.data.message);
+        console.log(messages);
+        for (const message in messages) {
+          toast.error(messages[message]);
+        }
+      });
   };
 
   return (
