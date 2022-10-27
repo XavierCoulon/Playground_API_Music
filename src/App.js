@@ -7,7 +7,7 @@ import TracksList from "./components/TracksList";
 function App() {
   return (
     <Fragment>
-      <div className="App">
+      <div className="flex-c justify-center align-middle m-auto">
         <TracksList />
         <Playlists />
         <GenresList />

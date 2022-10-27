@@ -14,61 +14,53 @@ const axiosInstance = axios.create({
 });
 
 // Endpoints related to songs
-export const getAllSongs = async () => await axiosInstance.get("/songs");
 
-export const getSong = async (trackID) =>
-  await axiosInstance.get(`songs/${trackID}`);
-
-export const deleteSong = async (trackID) =>
-  await axiosInstance.delete(`songs/${trackID}`);
-
-export const uploadTrack = async (selectedFile) => {
-  const formData = new FormData();
-  formData.append("file", selectedFile);
-  await axiosInstance.post("songs/", formData);
+export const songs = {
+  getAll: async () => (await axiosInstance.get("/songs")).data,
+  getOne: async (id) => (await axiosInstance.get(`songs/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`songs/${id}`)).data,
+  upload: async (selectedFile) => {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    const res = await axiosInstance.post("songs/", formData);
+    return res.data;
+  },
 };
 
 // Endpoints related to albums
 
-export const getAllAlbums = async () => await axiosInstance.get("/albums");
-
-export const getAlbum = async (albumID) =>
-  await axiosInstance.get(`songs/${albumID}`);
-
-export const deleteAlbum = async (albumID) =>
-  await axiosInstance.delete(`songs/${albumID}`);
-
-export const uploadPicture = async (selectedPicture, albumId) => {
-  const formData = new FormData();
-  formData.append("file", selectedPicture);
-  await axiosInstance.post(`albums/${albumId}/picture`, formData);
+export const albums = {
+  getAll: async () => (await axiosInstance.get("/albums")).data,
+  getOne: async (id) => (await axiosInstance.get(`albums/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`albums/${id}`)).data,
+  upload: async (selectedPicture, id) => {
+    const formData = new FormData();
+    formData.append("file", selectedPicture);
+    const res = await axiosInstance.post(`albums/${id}/picture`, formData);
+    return res.data;
+  },
 };
 
 // Endpoints related to playlists
 
-export const createPlaylist = async (title, description, picture) => {
-  const formData = new FormData();
-  formData.append("title", title);
-  formData.append("description", description);
-  formData.append("picture", picture);
-  await axiosInstance.post("playlists/", formData);
+export const playlists = {
+  getAll: async () => (await axiosInstance.get("/playlists")).data,
+  getOne: async (id) => (await axiosInstance.get(`playlists/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`playlists/${id}`)).data,
+  create: async (title, description, picture) => {
+    const formData = new FormData();
+    formData.append("description", title);
+    formData.append("description", description);
+    formData.append("picture", picture);
+    const res = await axiosInstance.post("playlists/", formData);
+    return res.data;
+  },
 };
-
-export const getAllPlaylist = async () => await axiosInstance.get("/playlists");
-
-export const getPlaylist = async (playlistID) =>
-  await axiosInstance.get(`playlists/${playlistID}`);
-
-export const deletePlaylist = async (playlistID) =>
-  await axiosInstance.delete(`playlists/${playlistID}`);
 
 // Endpoints related to genre
 
-export const getAllGenres = async () => await axiosInstance.get("/genres");
-
-export const getGenre = async (genreID) =>
-  await axiosInstance.get(`genre/${genreID}`);
-
-export const deleteGenre = async (genreID) =>
-  await axiosInstance.delete(`genre/${genreID}`);
-  
+export const genres = {
+  getAll: async () => (await axiosInstance.get("/genres")).data,
+  getOne: async (id) => (await axiosInstance.get(`genres/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`genres/${id}`)).data,
+};

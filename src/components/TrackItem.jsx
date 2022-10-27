@@ -11,15 +11,15 @@ const TrackItem = ({ id, title, artist, mp3, img, onDelete, onClick }) => {
   };
 
   return (
-    <li style={{ listStyleType: "none" }} key={id}>
-      <div>
-        <span style={{ cursor: "pointer" }} onClick={clickHandler}>
-          &#9654;
-        </span>{" "}
+    <li className="flex m-2 justify-between" key={id}>
+      <p className="inline-block align-middle">
+        <Button type="click" label="🎼" onClick={clickHandler} />
         {title} - {artist}
-      </div>
-      <img src={img} alt="album" />
+      </p>
+      <div className="flex">
+      <img className="w-10" src={img} alt="album" />
       <Button type="click" label="Delete" onClick={deleteHandler} />
+      </div>
     </li>
   );
 };
