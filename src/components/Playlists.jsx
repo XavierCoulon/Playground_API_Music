@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { playlists } from "../utils/axiosTools";
+import PlaylistItem from "./PlaylistItem";
 
-const Playlists = () => {
+const Playlists = ({trackId}) => {
   const [data, setData] = useState();
 
   useEffect(() => {
@@ -11,19 +12,16 @@ const Playlists = () => {
   return (
     data && (
       <div className="text-center">
-        <label htmlFor="playlists">Able to display playlists:</label>
-
-        <select
-          className="text-grey-500 mr-5 py-2 px-6 rounded-full border-0 text-sm font-medium bg-blue-50 text-blue-700 hover:bg-amber-50 hover:text-amber-700"
-          name="playlists"
-          id="playlists"
-        >
+        <ul>
           {data.map((playlist) => (
-            <option key={playlist.id} value={playlist.title}>
-              {playlist.title}
-            </option>
+            <PlaylistItem
+              key={playlist.id}
+              id={playlist.id}
+              title={playlist.title}
+              trackId={trackId}
+            />
           ))}
-        </select>
+        </ul>
       </div>
     )
   );

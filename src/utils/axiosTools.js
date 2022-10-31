@@ -31,12 +31,12 @@ export const songs = {
 
 export const albums = {
   getAll: async () => (await axiosInstance.get("/albums")).data,
-  getOne: async (id) => (await axiosInstance.get(`albums/${id}`)).data,
-  delete: async (id) => (await axiosInstance.delete(`albums/${id}`)).data,
+  getOne: async (id) => (await axiosInstance.get(`/albums/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`/albums/${id}`)).data,
   upload: async (selectedPicture, id) => {
     const formData = new FormData();
     formData.append("file", selectedPicture);
-    const res = await axiosInstance.post(`albums/${id}/picture`, formData);
+    const res = await axiosInstance.post(`/albums/${id}/picture`, formData);
     return res.data;
   },
 };
@@ -45,14 +45,23 @@ export const albums = {
 
 export const playlists = {
   getAll: async () => (await axiosInstance.get("/playlists")).data,
-  getOne: async (id) => (await axiosInstance.get(`playlists/${id}`)).data,
-  delete: async (id) => (await axiosInstance.delete(`playlists/${id}`)).data,
+  getOne: async (id) => (await axiosInstance.get(`/playlists/${id}`)).data,
+  delete: async (id) => (await axiosInstance.delete(`/playlists/${id}`)).data,
   create: async (title, description, picture) => {
     const formData = new FormData();
-    formData.append("description", title);
+    formData.append("title", title);
     formData.append("description", description);
     formData.append("picture", picture);
-    const res = await axiosInstance.post("playlists/", formData);
+    const res = await axiosInstance.post("/playlists/", formData);
+    return res.data;
+  },
+  assignTrack: async (playlistId, trackId) => {
+    console.log(trackId);
+    const res = await axiosInstance.post(
+      `playlists/${playlistId}/addsong`,
+      trackId,
+      { headers: { "Content-type": "application/json" } }
+    );
     return res.data;
   },
 };

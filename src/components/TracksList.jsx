@@ -2,41 +2,45 @@ import React, { useEffect, useState } from "react";
 import TrackItem from "./TrackItem";
 import Button from "./UI/Button";
 import TrackPlayer from "./TrackPlayer";
+import PlaylistsModal from "./PlaylistsModal";
 import { songs } from "../utils/axiosTools";
 import { toast } from "react-toastify";
-
 
 const TracksList = () => {
   const [data, setData] = useState([]);
   const [selectedFile, setSelectedFile] = useState();
   const [trackSrc, setTrackSrc] = useState();
-  const [isLoading, setIsloading] = useState(false);
-  // const notify = (message) => toast(message);
+  const [playlistsModal, setPlaylistsModal] = useState({
+    isActive: false,
+    trackId: null,
+  });
 
   useEffect(() => {
-    setIsloading(true);
-    songs
-      .getAll()
-      .then((result) => setData(result))
-      .then(() => setIsloading(false));
+    songs.getAll().then((result) => setData(result));
   }, []);
 
   const handlerDeleteTrack = async (id) => {
-    setIsloading(true);
+    const modale = toast.loading("Please wait...");
     songs
       .delete(id)
-      .then((result) => {
-        toast.success(result.message);
-      })
       .then(() =>
         songs.getAll().then((result) => {
           setData(result);
-          setIsloading(false);
+          toast.update(modale, {
+            render: "All is good, track delete",
+            type: "success",
+            isLoading: false,
+            autoClose: 2000,
+          });
         })
       )
-      .then(() => setIsloading(false))
       .catch((error) => {
-        console.log(error);
+        toast.update(modale, {
+          render: "Oupssss",
+          type: "error",
+          isLoading: false,
+          autoClose: 2000,
+        });
       });
   };
 
@@ -44,27 +48,42 @@ const TracksList = () => {
     setTrackSrc(trackSrc);
   };
 
+  const handlerPlaylistModal = (trackId) => {
+    setPlaylistsModal({ ...playlistsModal, isActive: true, trackId: trackId });
+  };
+
+  const handlerCloseModal = () => {
+    setPlaylistsModal({ ...playlistsModal, isActive: false, trackId: null });
+  }
+
   const changeHandler = (event) => {
     setSelectedFile(event.target.files[0]);
   };
 
   const handleSubmission = async (event) => {
     event.preventDefault();
-    setIsloading(true);
-    const id = toast.loading("Please wait...")
+    const modal = toast.loading("Please wait...");
     songs
       .upload(selectedFile)
       .then((result) => {
         // toast.success(`Song ${result.title} created`)
-        toast.update(id, {render: "All is good", type: "success", isLoading: false});
+        toast.update(modal, {
+          render: `All is good, ${result.title} uploaded!`,
+          type: "success",
+          isLoading: false,
+          autoClose: 2000,
+        });
       })
       .then(() => songs.getAll().then((result) => setData(result)))
-      .then(() => setIsloading(false))
       .catch((error) => {
-        setIsloading(false);
-
         const messages = JSON.parse(error.response.data.message);
-        console.log(messages);
+        toast.update(modal, {
+          render: `Oupsss...`,
+          type: "warning",
+          isLoading: false,
+          autoClose: 3000,
+        });
+
         for (const message in messages) {
           toast.error(messages[message]);
         }
@@ -73,11 +92,6 @@ const TracksList = () => {
 
   return (
     <div>
-      {isLoading && (
-        <h2 className="text-3xl font-bold underline text-red-500">
-          Loading...
-        </h2>
-      )}
       <h1 className="text-center text-3xl m-5">
         API Tests - without design 😉{" "}
       </h1>
@@ -92,6 +106,7 @@ const TracksList = () => {
             img={track.album.picture}
             onDelete={handlerDeleteTrack}
             onClick={handlerPlayTrack}
+            onPlaylist={handlerPlaylistModal}
           />
         ))}
       </ul>
@@ -116,6 +131,9 @@ const TracksList = () => {
         <Button type="click" label="Upload" onClick={handleSubmission} />
       </form>
       <TrackPlayer src={trackSrc} />
+      {playlistsModal.isActive && (
+        <PlaylistsModal trackId={playlistsModal.trackId} onClose={handlerCloseModal} />
+      )}
     </div>
   );
 };
