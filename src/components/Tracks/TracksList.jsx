@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import TrackItem from "./TrackItem";
-import Button from "./UI/Button";
+import Button from "../UI/Button";
 import TrackPlayer from "./TrackPlayer";
-import PlaylistsModal from "./PlaylistsModal";
-import { songs } from "../utils/axiosTools";
+import PlaylistsModal from "../Playlists/PlaylistsModal";
+import { songs } from "../../utils/axiosTools";
 import { toast } from "react-toastify";
 
-const TracksList = () => {
+const TracksList = ({ label }) => {
   const [data, setData] = useState([]);
   const [selectedFile, setSelectedFile] = useState();
   const [trackSrc, setTrackSrc] = useState();
@@ -27,7 +27,7 @@ const TracksList = () => {
         songs.getAll().then((result) => {
           setData(result);
           toast.update(modale, {
-            render: "All is good, track delete",
+            render: "All is good, track deleted",
             type: "success",
             isLoading: false,
             autoClose: 2000,
@@ -54,7 +54,7 @@ const TracksList = () => {
 
   const handlerCloseModal = () => {
     setPlaylistsModal({ ...playlistsModal, isActive: false, trackId: null });
-  }
+  };
 
   const changeHandler = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -95,7 +95,8 @@ const TracksList = () => {
       <h1 className="text-center text-3xl m-5">
         API Tests - without design 😉{" "}
       </h1>
-      <ul className="flex-col m-20">
+      <h2>{label}</h2>
+      <ul className="flex-col">
         {data.map((track) => (
           <TrackItem
             key={track.id}
@@ -132,7 +133,10 @@ const TracksList = () => {
       </form>
       <TrackPlayer src={trackSrc} />
       {playlistsModal.isActive && (
-        <PlaylistsModal trackId={playlistsModal.trackId} onClose={handlerCloseModal} />
+        <PlaylistsModal
+          trackId={playlistsModal.trackId}
+          onClose={handlerCloseModal}
+        />
       )}
     </div>
   );

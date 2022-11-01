@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { playlists } from "../utils/axiosTools";
+import { playlists } from "../../utils/axiosTools.js";
 import PlaylistItem from "./PlaylistItem";
 
 const Playlists = ({trackId}) => {
