@@ -5,6 +5,7 @@ import TrackPlayer from "./TrackPlayer";
 import PlaylistsModal from "../Playlists/PlaylistsModal";
 import { songs } from "../../utils/axiosTools";
 import { toast } from "react-toastify";
+import { storage} from "../../utils/localStorageTools.js"
 
 const TracksList = ({ label }) => {
   const [data, setData] = useState([]);
@@ -14,6 +15,9 @@ const TracksList = ({ label }) => {
     isActive: false,
     trackId: null,
   });
+
+  const favorites = storage.get("favorite");
+
 
   useEffect(() => {
     songs.getAll().then((result) => setData(result));
@@ -97,6 +101,7 @@ const TracksList = ({ label }) => {
       </h1>
       <h2>{label}</h2>
       <ul className="flex-col">
+      {/* {data.filter((track) => favorites.includes(track.id)).map((track) => ( */}
         {data.map((track) => (
           <TrackItem
             key={track.id}
